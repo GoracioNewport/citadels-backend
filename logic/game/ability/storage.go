@@ -9,7 +9,6 @@ import (
 var BaseAbilities = []Generator{
 	GenerateBaseLootBank,
 	GenerateBaseDrawCards,
-	GenerateBaseConstructBuilding,
 	GenerateEndTurn,
 }
 
@@ -18,9 +17,6 @@ func GenerateBaseLootBank() Ability {
 }
 func GenerateBaseDrawCards() Ability {
 	return NewAbility(enums.BaseDrawCardsKey, enums.Instant, true, true)
-}
-func GenerateBaseConstructBuilding() Ability {
-	return NewAbility(enums.BaseConstructBuildingKey, enums.Instant, true, true)
 }
 func GenerateEndTurn() Ability { return NewAbility(enums.BaseEndTurnKey, enums.Instant, false, true) }
 
@@ -73,7 +69,13 @@ func GenerateMerchantLootBank() Ability {
 
 // Architect
 
-var ArchitectAbilities = []Generator{}
+var ArchitectAbilities = []Generator{
+	GenerateArchitectLootDeck,
+}
+
+func GenerateArchitectLootDeck() Ability {
+	return NewAbility(enums.ArchitectLootDeckKey, enums.Instant, true, false)
+}
 
 // Warlord
 
