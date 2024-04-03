@@ -1,6 +1,7 @@
 package game
 
 import (
+	"citadels-backend/logic/game/enums"
 	"citadels-backend/ws/dto/game"
 	"citadels-backend/ws/sender"
 	"sort"
@@ -8,7 +9,7 @@ import (
 
 func (g *Game) endGame() {
 	g.BroadcastServerMessage("Подсчитываем очки...")
-	g.stage = EndGame
+	g.stage = enums.EndGame
 
 	g.BroadcastState()
 
@@ -18,12 +19,12 @@ func (g *Game) endGame() {
 		score := calculateScore(g, p)
 
 		scores = append(scores, game.ScoreboardEntryDto{
-			Name:  p.Name,
-			Score: score,
+			Name:       p.Name,
+			TotalScore: score,
 		})
 	}
 
-	sort.Slice(scores, func(i, j int) bool { return scores[i].Score > scores[j].Score })
+	sort.Slice(scores, func(i, j int) bool { return scores[i].TotalScore > scores[j].TotalScore })
 
 	for _, p := range g.players {
 		sender.SendGameFinalScoresMessage(p.Connection, ManagerInstance.Server, scores)

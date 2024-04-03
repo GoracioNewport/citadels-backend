@@ -143,13 +143,7 @@ func HandleGameConstructBuildingAbility(ws *websocket.Conn, server *api.WebSocke
 		return
 	}
 
-	ok := gameInstance.ActivateAbility(playerInstance, abilityEnums.BaseConstructBuildingKey)
-	if !ok {
-		sender.SendStatusMessage(ws, server, 404, "Cannot activate ability")
-		return
-	}
-
-	ok = playerInstance.ConstructBuilding(payload.Id)
+	ok := playerInstance.ConstructBuilding(payload.Id)
 
 	if !ok {
 		sender.SendStatusMessage(ws, server, 404, "Cannot construct building")

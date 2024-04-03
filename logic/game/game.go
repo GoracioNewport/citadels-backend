@@ -4,7 +4,7 @@ import (
 	"citadels-backend/logic/game/ability/enums"
 	"citadels-backend/logic/game/card"
 	"citadels-backend/logic/game/character"
-	"citadels-backend/ws/dto/game"
+	enums2 "citadels-backend/logic/game/enums"
 	"math/rand"
 	"strconv"
 )
@@ -12,7 +12,7 @@ import (
 type Game struct {
 	code                     string
 	players                  []*Player
-	stage                    Stage
+	stage                    enums2.Stage
 	characters               []*character.Character
 	mainDeck                 []card.Building
 	currentCharacterIndex    int
@@ -56,10 +56,10 @@ func (g *Game) StartGame() {
 
 func (g *Game) StartTurnLoop() {
 	g.BroadcastServerMessage("Стадия: ход персонажей")
-	g.stage = TurnLoop
+	g.stage = enums2.TurnLoop
 
 	for _, c := range g.characters {
-		c.ResetAbilities()
+		c.ResetCharacter()
 	}
 
 	g.currentCharacterIndex = 0
@@ -81,7 +81,7 @@ func (g *Game) StartTurn() {
 		return
 	}
 
-	g.GetCurrentCharacter().ResetAbilities()
+	g.GetCurrentCharacter().ReloadCharacter()
 
 	player := g.GetCurrentPlayer()
 
@@ -218,6 +218,10 @@ func (g *Game) ActivateAbility(player *Player, key enums.Key) bool {
 
 			if ability.ActivationType == enums.Instant {
 				abilityFunction := GetInstantAbilityFunction(key)
+				if abilityFunction == nil {
+					return false
+				}
+
 				abilityFunction(g, c, player, ability)
 
 				g.BroadcastState()
@@ -227,16 +231,4 @@ func (g *Game) ActivateAbility(player *Player, key enums.Key) bool {
 	}
 
 	return false
-}
-
-func (g *Game) ToDto(playerInstance *Player) game.StateDto {
-	if g.stage == CharacterSelection {
-		return g.generateDtoSelectionStage(playerInstance)
-	} else if g.stage == TurnLoop {
-		return g.generateDtoTurnLoopStage(playerInstance)
-	} else if g.stage == EndGame {
-		return g.generateDtoEndGameStage(playerInstance)
-	}
-
-	return game.StateDto{}
 }

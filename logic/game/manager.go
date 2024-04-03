@@ -20,21 +20,24 @@ func InitManager(server *api.WebSocketServer) {
 }
 
 func (m *Manager) CreateGame(lobby lobby.Lobby) {
+	game := &Game{
+		code: lobby.Code,
+	}
+
 	var players = make([]*Player, 0)
 
-	for _, m := range lobby.Members {
+	for _, mem := range lobby.Members {
 		players = append(players, &Player{
-			Name:       m.Name,
-			Connection: m.Connection,
-			Crown:      lobby.Host == m.Name,
+			Name:       mem.Name,
+			Connection: mem.Connection,
+			Crown:      lobby.Host == mem.Name,
+			Game:       game,
 		})
 	}
 
-	m.games[lobby.Code] = &Game{
-		code:    lobby.Code,
-		players: players,
-	}
+	game.players = players
 
+	m.games[lobby.Code] = game
 	m.games[lobby.Code].StartGame()
 }
 

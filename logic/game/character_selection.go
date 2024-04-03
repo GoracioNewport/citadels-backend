@@ -2,12 +2,13 @@ package game
 
 import (
 	"citadels-backend/logic/game/character"
+	"citadels-backend/logic/game/enums"
 	"math/rand"
 	"sort"
 )
 
 func (g *Game) startCharacterSelection() {
-	g.stage = CharacterSelection
+	g.stage = enums.CharacterSelection
 	g.BroadcastServerMessage("Стадия: выбор персонажей")
 
 	g.selectedClasses = make([]character.Class, 0)
@@ -97,7 +98,7 @@ func (g *Game) availableForSelection(class character.Class) bool {
 }
 
 func (g *Game) PickCharacter(player *Player, class character.Class) bool {
-	if g.stage != CharacterSelection {
+	if g.stage != enums.CharacterSelection {
 		return false
 	}
 

@@ -1,4 +1,4 @@
-package game
+package enums
 
 import "citadels-backend/ws/dto/game"
 

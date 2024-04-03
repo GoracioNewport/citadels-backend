@@ -3,6 +3,7 @@ package game
 import (
 	"citadels-backend/logic/game/ability/enums"
 	"citadels-backend/logic/game/character"
+	enums2 "citadels-backend/logic/game/enums"
 	"citadels-backend/ws/dto/game"
 )
 
@@ -125,12 +126,24 @@ func generatePlayerDto(playerInstance *Player, character *character.Character) g
 
 	// Hand active population
 	if character != nil {
-		for i, c := range playerDto.Hand {
-			if c.Price <= playerDto.Bank && character.CheckAbility(enums.BaseConstructBuildingKey) {
+		for i, c := range playerInstance.Hand {
+			if canPlayCard(playerInstance, character, c) {
 				playerDto.Hand[i].Active = true
 			}
 		}
 	}
 
 	return playerDto
+}
+
+func (g *Game) ToDto(playerInstance *Player) game.StateDto {
+	if g.stage == enums2.CharacterSelection {
+		return g.generateDtoSelectionStage(playerInstance)
+	} else if g.stage == enums2.TurnLoop {
+		return g.generateDtoTurnLoopStage(playerInstance)
+	} else if g.stage == enums2.EndGame {
+		return g.generateDtoEndGameStage(playerInstance)
+	}
+
+	return game.StateDto{}
 }

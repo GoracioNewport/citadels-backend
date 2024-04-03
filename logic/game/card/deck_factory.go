@@ -3,6 +3,7 @@ package card
 import (
 	"citadels-backend/logic/game/card/template"
 	"math/rand"
+	"strconv"
 )
 
 const (
@@ -32,4 +33,42 @@ func GenerateMainDeck() []Building {
 	})
 
 	return deck
+}
+
+var id = 0
+var cardById = make(map[int]Building)
+
+func BuildingFromTemplate(template template.BuildingTemplate) Building {
+	cardId := id
+	id++
+
+	var image string
+	if template.Image == "" {
+		image = string(template.Color.ToDto()) + "_" + strconv.Itoa(template.Price) + ".png"
+	} else {
+		image = template.Image
+	}
+
+	building := Building{
+		Name:        template.Name,
+		Color:       template.Color,
+		Description: template.Description,
+		Price:       template.Price,
+		Image:       image,
+		Id:          cardId,
+	}
+
+	cardById[cardId] = building
+
+	return building
+}
+
+func GetCardById(id int) *Building {
+	card, ok := cardById[id]
+
+	if !ok {
+		return nil
+	}
+
+	return &card
 }

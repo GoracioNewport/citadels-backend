@@ -7,28 +7,17 @@ import (
 )
 
 type Character struct {
-	Class        Class
-	Order        int
-	Abilities    []*ability.Ability
-	Name         string
-	Description  []string
-	Image        string
-	Dead         bool
-	Robbed       bool
-	BannedHidden bool
-	BannedOpen   bool
-}
-
-func (c *Character) GetUnusedAbilities() []ability.Ability {
-	unusedList := make([]ability.Ability, 0)
-
-	for _, a := range c.Abilities {
-		if !a.Active {
-			unusedList = append(unusedList, *a)
-		}
-	}
-
-	return unusedList
+	Class                Class
+	Order                int
+	Abilities            []*ability.Ability
+	Name                 string
+	Description          []string
+	Image                string
+	Dead                 bool
+	Robbed               bool
+	BannedHidden         bool
+	BannedOpen           bool
+	AllowedConstructions int
 }
 
 func (c *Character) SetAbilityActive(key enums.Key, state bool) {
@@ -59,7 +48,28 @@ func (c *Character) CheckAbility(key enums.Key) bool {
 	return false
 }
 
-func (c *Character) ResetAbilities() {
+func (c *Character) ResetCharacter() {
+	c.Dead = false
+	c.Robbed = false
+	c.BannedHidden = false
+	c.BannedOpen = false
+	c.ReloadCharacter()
+}
+
+func (c *Character) ReloadCharacter() {
+	c.reloadAllowedConstructions()
+	c.reloadAbilities()
+}
+
+func (c *Character) reloadAllowedConstructions() {
+	c.AllowedConstructions = 1
+
+	if c.Class == Architect {
+		c.AllowedConstructions = 3
+	}
+}
+
+func (c *Character) reloadAbilities() {
 	for i := range c.Abilities {
 		c.Abilities[i].Active = c.Abilities[i].DefaultState
 	}

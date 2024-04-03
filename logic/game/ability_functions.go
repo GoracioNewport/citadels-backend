@@ -51,10 +51,6 @@ func ActivateBaseDrawCards(g *Game, c *character.Character, p *Player, a *abilit
 	c.SetAbilityActive(enums.BaseEndTurnKey, true)
 }
 
-func ActivateBaseConstructBuilding(g *Game, c *character.Character, p *Player, a *ability.Ability) {
-	a.Active = false
-}
-
 func ActivateBaseEndTurn(g *Game, c *character.Character, p *Player, a *ability.Ability) {
 	a.Active = false
 	g.EndTurn()
@@ -94,16 +90,33 @@ func ActivateWarlordLootCity(g *Game, c *character.Character, p *Player, a *abil
 	activateColorLootCity(p, a, template.Red)
 }
 
+func ActivateArchitectLootDeck(g *Game, c *character.Character, p *Player, a *ability.Ability) {
+	cardAmount := 2
+	cardList := make([]card.Building, 0)
+
+	for i := 0; i < cardAmount; i++ {
+		cardInstance := g.DrawCardFromMainDeck()
+
+		if cardInstance != nil {
+			cardList = append(cardList, *cardInstance)
+		}
+	}
+
+	p.Hand = append(p.Hand, cardList...)
+
+	a.Active = false
+}
+
 var InstantAbilityFunctions = map[enums.Key]ActivateInstantAbility{
-	enums.BaseLootBankKey:          ActivateBaseLootBank,
-	enums.BaseDrawCardsKey:         ActivateBaseDrawCards,
-	enums.BaseEndTurnKey:           ActivateBaseEndTurn,
-	enums.BaseConstructBuildingKey: ActivateBaseConstructBuilding,
-	enums.KingLootCityKey:          ActivateKingLootCity,
-	enums.BishopLootCityKey:        ActivateBishopLootCity,
-	enums.MerchantLootCityKey:      ActivateMerchantLootCity,
-	enums.MerchantLootBankKey:      ActivateMerchantLootBank,
-	enums.WarlordLootCityKey:       ActivateWarlordLootCity,
+	enums.BaseLootBankKey:      ActivateBaseLootBank,
+	enums.BaseDrawCardsKey:     ActivateBaseDrawCards,
+	enums.BaseEndTurnKey:       ActivateBaseEndTurn,
+	enums.KingLootCityKey:      ActivateKingLootCity,
+	enums.BishopLootCityKey:    ActivateBishopLootCity,
+	enums.MerchantLootCityKey:  ActivateMerchantLootCity,
+	enums.MerchantLootBankKey:  ActivateMerchantLootBank,
+	enums.WarlordLootCityKey:   ActivateWarlordLootCity,
+	enums.ArchitectLootDeckKey: ActivateArchitectLootDeck,
 }
 
 func GetInstantAbilityFunction(key enums.Key) ActivateInstantAbility {

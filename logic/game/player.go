@@ -16,33 +16,48 @@ type Player struct {
 	Name            string
 	Bank            int
 	Crown           bool
+	Game            *Game
 }
 
 func (p *Player) GiveCard(card card.Building) {
 	p.Hand = append(p.Hand, card)
 }
 
-func (p *Player) ConstructBuilding(id int) bool {
-	var cardInstance card.Building
-	found := false
+func (p *Player) GetCurrentCharacter() *character.Character {
+	var characterReference *character.Character = nil
 
-	for _, c := range p.Hand {
-		if c.Id == id {
-			cardInstance = c
-			found = true
+	if p.Game.GetCurrentCharacter() == nil {
+		return nil
+	}
+
+	for _, c := range p.Characters {
+		if c.Class == p.Game.GetCurrentCharacter().Class {
+			characterReference = c
 			break
 		}
 	}
 
-	if !found {
+	return characterReference
+}
+
+func (p *Player) ConstructBuilding(id int) bool {
+	cardInstance := card.GetCardById(id)
+
+	if cardInstance == nil {
 		return false
 	}
 
-	if p.Bank < cardInstance.Price {
+	currentCharacter := p.GetCurrentCharacter()
+
+	if currentCharacter == nil {
 		return false
 	}
 
-	p.Town = append(p.Town, cardInstance)
+	if !canPlayCard(p, currentCharacter, *cardInstance) {
+		return false
+	}
+
+	p.Town = append(p.Town, *cardInstance)
 
 	for i, c := range p.Hand {
 		if c.Id == id {
@@ -51,7 +66,8 @@ func (p *Player) ConstructBuilding(id int) bool {
 		}
 	}
 
-	p.Bank -= cardInstance.Price
+	p.Bank -= calculateCardPrice(p, *cardInstance)
+	currentCharacter.AllowedConstructions--
 
 	return true
 }
