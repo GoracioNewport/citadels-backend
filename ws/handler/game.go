@@ -2,6 +2,7 @@ package handler
 
 import (
 	"citadels-backend/logic/game"
+	"citadels-backend/logic/game/ability"
 	abilityEnums "citadels-backend/logic/game/ability/enums"
 	"citadels-backend/logic/game/character"
 	"citadels-backend/ws/api"
@@ -151,5 +152,37 @@ func HandleGameConstructBuildingAbility(ws *websocket.Conn, server *api.WebSocke
 	}
 
 	sender.SendStatusMessage(ws, server, 200, "Building constructed")
+	gameInstance.BroadcastState()
+}
+
+func HandleGameTargetAbility(ws *websocket.Conn, server *api.WebSocketServer, message enums.GenericServerBoundMessage) {
+	var payload enums.GameTargetAbilityMessage
+	var err = json.Unmarshal(message.Payload, &payload)
+
+	if err != nil {
+		log.Println("Unmarshal error:", err)
+		return
+	}
+
+	gameInstance := game.ManagerInstance.GetGame(payload.Code)
+	if gameInstance == nil {
+		sender.SendStatusMessage(ws, server, 404, "Game not found")
+		return
+	}
+
+	playerInstance := gameInstance.GetPlayer(payload.Name)
+	if playerInstance == nil {
+		sender.SendStatusMessage(ws, server, 404, "Player not found")
+		return
+	}
+
+	ok := gameInstance.TargetAbility(playerInstance, ability.TargetContextFromDto(payload))
+
+	if !ok {
+		sender.SendStatusMessage(ws, server, 404, "Cannot target ability")
+		return
+	}
+
+	sender.SendStatusMessage(ws, server, 200, "Ability targeted")
 	gameInstance.BroadcastState()
 }

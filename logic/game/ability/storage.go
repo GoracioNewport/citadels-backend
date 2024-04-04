@@ -22,15 +22,33 @@ func GenerateEndTurn() Ability { return NewAbility(enums.BaseEndTurnKey, enums.I
 
 // Assassin
 
-var AssassinAbilities = []Generator{}
+var AssassinAbilities = []Generator{
+	GenerateAssassinKillCharacter,
+}
+
+func GenerateAssassinKillCharacter() Ability {
+	return NewAbility(enums.AssassinKillCharacterKey, enums.Targeted, true, false)
+}
 
 // Thief
 
-var ThiefAbilities = []Generator{}
+var ThiefAbilities = []Generator{
+	GenerateThiefLootCharacter,
+}
+
+func GenerateThiefLootCharacter() Ability {
+	return NewAbility(enums.ThiefLootCharacterKey, enums.Targeted, true, false)
+}
 
 // Magician
 
-var MagicianAbilities = []Generator{}
+var MagicianAbilities = []Generator{
+	GenerateMagicianSwapCards,
+}
+
+func GenerateMagicianSwapCards() Ability {
+	return NewAbility(enums.MagicianSwapCardsKey, enums.Targeted, true, false)
+}
 
 // King
 

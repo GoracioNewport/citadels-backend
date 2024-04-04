@@ -11,7 +11,7 @@ func (g *Game) startCharacterSelection() {
 	g.stage = enums.CharacterSelection
 	g.BroadcastServerMessage("Стадия: выбор персонажей")
 
-	g.selectedClasses = make([]character.Class, 0)
+	g.selectedCharacters = make([]*character.Character, 0)
 	g.bannedClasses = make([]character.Class, 0)
 
 	g.currentPlayerIndex = 0
@@ -80,8 +80,8 @@ func (g *Game) startSelectionRound() {
 }
 
 func (g *Game) availableForSelection(class character.Class) bool {
-	for _, c := range g.selectedClasses {
-		if c == class {
+	for _, c := range g.selectedCharacters {
+		if c.Class == class {
 			return false
 		}
 	}
@@ -118,7 +118,7 @@ func (g *Game) PickCharacter(player *Player, class character.Class) bool {
 		}
 	}
 
-	g.selectedClasses = append(g.selectedClasses, class)
+	g.selectedCharacters = append(g.selectedCharacters, selectedCharacter)
 	player.Characters = append(player.Characters, selectedCharacter)
 
 	g.currentPlayerIndex++

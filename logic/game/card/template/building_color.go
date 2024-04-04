@@ -12,6 +12,10 @@ const (
 	Purple
 )
 
+const (
+	ColorAmount = 5
+)
+
 func (c BuildingColor) ToDto() game.CardColorDto {
 	switch c {
 	case Yellow:

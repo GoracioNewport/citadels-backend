@@ -9,4 +9,5 @@ type StateDto struct {
 	GlobalBankActive bool                  `json:"global_bank_active"`
 	EndTurnActive    bool                  `json:"end_turn_active"`
 	Stage            Stage                 `json:"stage"`
+	PendingAbility   bool                  `json:"pending_ability"`
 }

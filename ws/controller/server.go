@@ -27,6 +27,7 @@ var handlerMap = map[enums.ServerBoundMessage]api.HandlerFunc{
 	enums.GameChooseCard:               handler.HandleGameChooseCard,
 	enums.GameConstructBuildingAbility: handler.HandleGameConstructBuildingAbility,
 	enums.GamePickCharacter:            handler.HandleGamePickCharacter,
+	enums.GameTargetAbility:            handler.HandleGameTargetAbility,
 }
 
 func NewWebSocketServer() *api.WebSocketServer {

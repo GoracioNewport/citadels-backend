@@ -1,54 +1,28 @@
 package game
 
 import (
-	"citadels-backend/logic/game/ability/enums"
 	"citadels-backend/logic/game/character"
 	enums2 "citadels-backend/logic/game/enums"
 	"citadels-backend/ws/dto/game"
 )
 
 func (g *Game) generateDtoTurnLoopStage(playerInstance *Player) game.StateDto {
-	currentTurn := false
-	var currentCharacter *character.Character = nil
-
-	mainDeckActive := false
-	globalBankActive := false
-
-	endTurnActive := true
-
-	for _, c := range playerInstance.Characters {
-		if c.Class == g.GetCurrentCharacter().Class {
-			currentTurn = true
-			currentCharacter = c
-			break
-		}
-	}
-
-	if currentTurn {
-		globalBankActive = currentCharacter.CheckAbility(enums.BaseLootBankKey)
-		mainDeckActive = currentCharacter.CheckAbility(enums.BaseDrawCardsKey)
-		endTurnActive = currentCharacter.CheckAbility(enums.BaseEndTurnKey)
-	}
-
-	if !currentTurn {
-		endTurnActive = false
-	}
-
 	characters := make([]game.CharacterInfoDto, 0)
 	for _, c := range g.characters {
 		characters = append(characters, c.ToInfoDto(g.GetCurrentCharacter().Class, false))
 	}
 
-	return game.StateDto{
-		Players:          generatePlayersDto(g),
-		Characters:       characters,
-		Player:           generatePlayerDto(playerInstance, currentCharacter),
-		MainDeckSize:     len(g.mainDeck),
-		MainDeckActive:   mainDeckActive,
-		GlobalBankActive: globalBankActive,
-		EndTurnActive:    endTurnActive,
-		Stage:            g.stage.ToDto(),
+	stateDto := game.StateDto{
+		Players:      generatePlayersDto(g),
+		Characters:   characters,
+		Player:       generatePlayerDto(playerInstance, g.GetCurrentCharacter()),
+		MainDeckSize: len(g.mainDeck),
+		Stage:        g.stage.ToDto(),
 	}
+
+	g.populateTurnLoopDto(playerInstance, &stateDto)
+
+	return stateDto
 }
 
 func (g *Game) generateDtoSelectionStage(playerInstance *Player) game.StateDto {
@@ -64,8 +38,8 @@ func (g *Game) generateDtoSelectionStage(playerInstance *Player) game.StateDto {
 		characterDto.Turn = false
 
 		found := false
-		for _, sc := range g.selectedClasses {
-			if sc == c.Class {
+		for _, sc := range g.selectedCharacters {
+			if sc.Class == c.Class {
 				found = true
 				break
 			}

@@ -7,6 +7,7 @@ type CharacterCardDto struct {
 	Type        CharacterClassDto     `json:"class"`
 	Active      bool                  `json:"active"`
 	Abilities   []CharacterAbilityDto `json:"abilities"`
+	Order       int                   `json:"order"`
 }
 
 func GetUnknownCharacterCardDto() CharacterCardDto {
@@ -16,5 +17,6 @@ func GetUnknownCharacterCardDto() CharacterCardDto {
 		Image:       "",
 		Type:        Unknown,
 		Abilities:   nil,
+		Order:       0,
 	}
 }

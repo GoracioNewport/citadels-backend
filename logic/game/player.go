@@ -23,6 +23,16 @@ func (p *Player) GiveCard(card card.Building) {
 	p.Hand = append(p.Hand, card)
 }
 
+func (p *Player) HasCharacter(class character.Class) bool {
+	for _, c := range p.Characters {
+		if c.Class == class {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (p *Player) GetCurrentCharacter() *character.Character {
 	var characterReference *character.Character = nil
 
@@ -114,7 +124,6 @@ func (p *Player) ToInfoDto() game.PlayerInfoDto {
 
 func (p *Player) ToCommonInfoDto(g *Game) game.PlayerCommonInfoDto {
 	charactersCardDto := make([]game.CharacterCardDto, 0)
-	charactersActive := make([]bool, 0)
 
 	for _, c := range p.Characters {
 		if c.Order <= g.GetCurrentCharacter().Order && !c.Dead {
@@ -122,8 +131,6 @@ func (p *Player) ToCommonInfoDto(g *Game) game.PlayerCommonInfoDto {
 		} else {
 			charactersCardDto = append(charactersCardDto, game.GetUnknownCharacterCardDto())
 		}
-
-		charactersActive = append(charactersActive, false)
 	}
 
 	town := make([]game.CardDto, 0)
@@ -132,12 +139,11 @@ func (p *Player) ToCommonInfoDto(g *Game) game.PlayerCommonInfoDto {
 	}
 
 	return game.PlayerCommonInfoDto{
-		Name:             p.Name,
-		Coins:            p.Bank,
-		HandDeckSize:     len(p.Hand),
-		Characters:       charactersCardDto,
-		CharactersActive: charactersActive,
-		Crown:            p.Crown,
-		Town:             town,
+		Name:         p.Name,
+		Bank:         p.Bank,
+		HandDeckSize: len(p.Hand),
+		Characters:   charactersCardDto,
+		Crown:        p.Crown,
+		Town:         town,
 	}
 }

@@ -1,7 +1,6 @@
 package game
 
 import (
-	"citadels-backend/logic/game/ability/enums"
 	"citadels-backend/logic/game/card"
 	"citadels-backend/logic/game/character"
 	enums2 "citadels-backend/logic/game/enums"
@@ -19,7 +18,7 @@ type Game struct {
 	currentPlayerIndex       int
 	playerRotationIndexStart int
 	selectionRoundsLeft      int
-	selectedClasses          []character.Class
+	selectedCharacters       []*character.Character
 	bannedClasses            []character.Class
 	finishedPlayer           *Player
 }
@@ -69,8 +68,24 @@ func (g *Game) StartTurnLoop() {
 
 func (g *Game) StartTurn() {
 	found := false
-	for _, c := range g.selectedClasses {
-		if c == g.GetCurrentCharacter().Class {
+	for _, c := range g.selectedCharacters {
+		if c.Class == g.GetCurrentCharacter().Class {
+			if c.Robbed {
+				thief := g.GetPlayerByCharacter(character.Thief)
+				if thief == nil {
+					continue
+				}
+
+				g.SendServerMessage(g.GetCurrentPlayer(), "Вас ограбили и вы теряете все свои деньги!")
+				thief.Bank += g.GetCurrentPlayer().Bank
+				g.GetCurrentPlayer().Bank = 0
+			}
+
+			if c.Dead {
+				g.SendServerMessage(g.GetCurrentPlayer(), "Вас убили и вы пропускаете свой ход!")
+				break
+			}
+
 			found = true
 			break
 		}
@@ -203,32 +218,24 @@ func (g *Game) GetPlayer(name string) *Player {
 	return nil
 }
 
-func (g *Game) ActivateAbility(player *Player, key enums.Key) bool {
-	if player == nil || player.Characters == nil {
-		return false
+func (g *Game) GetCharacter(class character.Class) *character.Character {
+	for _, c := range g.characters {
+		if c.Class == class {
+			return c
+		}
 	}
 
-	for _, c := range player.Characters {
-		if c.Class == g.GetCurrentCharacter().Class && c.CheckAbility(key) {
-			ability := c.GetAbility(key)
+	return nil
+}
 
-			if !ability.Active {
-				continue
-			}
-
-			if ability.ActivationType == enums.Instant {
-				abilityFunction := GetInstantAbilityFunction(key)
-				if abilityFunction == nil {
-					return false
-				}
-
-				abilityFunction(g, c, player, ability)
-
-				g.BroadcastState()
-				return true
+func (g *Game) GetPlayerByCharacter(class character.Class) *Player {
+	for _, p := range g.players {
+		for _, c := range p.Characters {
+			if c.Class == class {
+				return p
 			}
 		}
 	}
 
-	return false
+	return nil
 }

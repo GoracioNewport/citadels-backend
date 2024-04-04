@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	codeLength = 4
+	codeLength = 1
 )
 
 type Manager struct {

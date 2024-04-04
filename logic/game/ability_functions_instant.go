@@ -11,7 +11,7 @@ import (
 	"log"
 )
 
-type ActivateInstantAbility func(g *Game, c *character.Character, p *Player, a *ability.Ability)
+type InstantAbilityActivator func(g *Game, c *character.Character, p *Player, a *ability.Ability)
 
 func ActivateBaseLootBank(g *Game, c *character.Character, p *Player, a *ability.Ability) {
 	p.Bank += 2
@@ -107,7 +107,7 @@ func ActivateArchitectLootDeck(g *Game, c *character.Character, p *Player, a *ab
 	a.Active = false
 }
 
-var InstantAbilityFunctions = map[enums.Key]ActivateInstantAbility{
+var InstantAbilityFunctions = map[enums.Key]InstantAbilityActivator{
 	enums.BaseLootBankKey:      ActivateBaseLootBank,
 	enums.BaseDrawCardsKey:     ActivateBaseDrawCards,
 	enums.BaseEndTurnKey:       ActivateBaseEndTurn,
@@ -119,7 +119,7 @@ var InstantAbilityFunctions = map[enums.Key]ActivateInstantAbility{
 	enums.ArchitectLootDeckKey: ActivateArchitectLootDeck,
 }
 
-func GetInstantAbilityFunction(key enums.Key) ActivateInstantAbility {
+func GetInstantAbilityFunction(key enums.Key) InstantAbilityActivator {
 	if _, ok := InstantAbilityFunctions[key]; !ok {
 		log.Printf("Instant ability function for key %s not found", key)
 		return nil

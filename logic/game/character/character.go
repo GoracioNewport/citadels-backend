@@ -7,17 +7,18 @@ import (
 )
 
 type Character struct {
-	Class                Class
-	Order                int
-	Abilities            []*ability.Ability
-	Name                 string
-	Description          []string
-	Image                string
-	Dead                 bool
-	Robbed               bool
-	BannedHidden         bool
-	BannedOpen           bool
-	AllowedConstructions int
+	Class                  Class
+	Order                  int
+	Abilities              []*ability.Ability
+	PendingTargetedAbility *ability.Ability
+	Name                   string
+	Description            []string
+	Image                  string
+	Dead                   bool
+	Robbed                 bool
+	BannedHidden           bool
+	BannedOpen             bool
+	AllowedConstructions   int
 }
 
 func (c *Character) SetAbilityActive(key enums.Key, state bool) {
@@ -80,9 +81,11 @@ func (c *Character) ToCardDto(generateAbilities bool) gameDto.CharacterCardDto {
 
 	if generateAbilities {
 		for _, a := range c.Abilities {
-			if !a.Hidden && a.Active {
-				abilities = append(abilities, a.ToDto())
+			if a.Hidden {
+				continue
 			}
+
+			abilities = append(abilities, a.ToDto())
 		}
 	}
 
@@ -91,6 +94,7 @@ func (c *Character) ToCardDto(generateAbilities bool) gameDto.CharacterCardDto {
 		Description: c.Description,
 		Image:       c.Image,
 		Type:        c.Class.ToDto(),
+		Order:       c.Order,
 		Abilities:   abilities,
 	}
 }

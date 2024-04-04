@@ -18,7 +18,6 @@ const (
 	LobbyStartGame    ServerBoundMessage = "lobby_start_game"
 
 	GameActivateAbility          ServerBoundMessage = "game_activate_ability"
-	GameCancelAbility            ServerBoundMessage = "game_cancel_ability"
 	GameTargetAbility            ServerBoundMessage = "game_target_ability"
 	GameChooseCard               ServerBoundMessage = "game_choose_card"
 	GameConstructBuildingAbility ServerBoundMessage = "game_construct_building_ability"
@@ -80,4 +79,12 @@ type GamePickCharacterMessage struct {
 	Code  string `json:"code"`
 	Name  string `json:"name"`
 	Class string `json:"class"`
+}
+
+type GameTargetAbilityMessage struct {
+	Code        string `json:"code"`
+	Name        string `json:"name"`
+	Key         string `json:"key"`
+	TargetArea  string `json:"target_area"`
+	TargetValue string `json:"target_value"`
 }
